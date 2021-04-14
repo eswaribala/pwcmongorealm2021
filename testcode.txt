@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    @Override
+   @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnAdd:
@@ -74,7 +74,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mongoDatabase=mongoClient.getDatabase("ecommercedb");
                 mongoCollection=mongoDatabase.getCollection("categories");
                 categories catObject=new categories(Integer.parseInt(inCategoryId.getText().toString().trim()),inCategoryName.getText().toString());
-               
+                mongoCollection.insertOne(new Document("userid",user.getId()).append("_id",catObject.get_id())
+                        .append("categoryName",catObject.getCategoryName())).getAsync(it->{
+                            if(it.isSuccess()){
+                                Log.v("msg","Category Added");
+                            }
+                            else
+                            {
+                                Log.e("errMsg",it.getError().getErrorMessage());
+                            }
+                });
 
                 break;
         }

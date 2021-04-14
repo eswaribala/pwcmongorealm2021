@@ -1,0 +1,83 @@
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+
+import com.veb.realmwebstoreapp.models.categories;
+
+import io.realm.Realm;
+import io.realm.mongodb.App;
+import io.realm.mongodb.AppConfiguration;
+import io.realm.mongodb.Credentials;
+import io.realm.mongodb.User;
+import io.realm.mongodb.mongo.MongoClient;
+import io.realm.mongodb.mongo.MongoCollection;
+import io.realm.mongodb.mongo.MongoDatabase;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    //step 1
+    String appId="rpsecommerceapp-uiakp";
+    User user;
+    App app;
+    MongoDatabase mongoDatabase;
+    MongoCollection mongoCollection;
+    MongoClient mongoClient;
+    Button btnAdd;
+    EditText inCategoryId,inCategoryName;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        // step 2
+        //initialize realm
+        Realm.init(this);
+        //Step 3
+        //Configure the application
+        App app =new App(new AppConfiguration.Builder(appId)
+                .appName("rpsecommerceapp")
+                .build());
+        //Step4
+       //anonymous user
+        //Credentials credentials=Credentials.anonymous();
+        //Login using Email and Password
+        Credentials credentials=Credentials.emailPassword("drvignesh1995@gmail.com","viki@123");
+        app.loginAsync(credentials, new App.Callback<User>() {
+            @Override
+            public void onResult(App.Result<User> result) {
+                if(result.isSuccess()){
+                    Log.v("User","With Email and Password Successfully logged in");
+                    initViews();
+                }
+                else
+                    Log.e("user","Login issue");
+
+            }
+        }) ;
+    }
+
+    private void initViews(){
+        btnAdd = findViewById(R.id.btnAdd);
+        btnAdd.setOnClickListener(this);
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnAdd:
+                Log.v("message", "Entered Use Case");
+                user = app.currentUser();
+                mongoClient=user.getMongoClient("mongodb-atlas");
+                mongoDatabase=mongoClient.getDatabase("ecommercedb");
+                mongoCollection=mongoDatabase.getCollection("categories");
+                categories catObject=new categories(Integer.parseInt(inCategoryId.getText().toString().trim()),inCategoryName.getText().toString());
+               
+
+                break;
+        }
+
+    }
+}

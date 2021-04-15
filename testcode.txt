@@ -86,6 +86,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
 
                 break;
+                
+                case R.id.btnRead:
+                Log.v("message","Reading Categories");
+                Document queryFilter=new Document("userid",user.getId()).append("_id",765);
+                mongoCollection.findOne(queryFilter).getAsync(it->{
+                    if(it.isSuccess()){
+
+                        txtCategory.setText(it.get().getString("categoryName"));
+                    }
+                    else
+                    {
+                        txtCategory.setText("No Data found");
+                    }
+                });
+                break;
         }
 
     }
